@@ -15,6 +15,47 @@ export const useCounterStore = defineStore("counter", {
     doubleCount: (state) => state.count * 2,
   },
   actions: {
+    async statusSubsribe(id) {
+      console.log(id);
+      try {
+        const { data } = await axios.patch(
+          originUrl + `/mycourses/${id}`,
+          {},
+          {
+            headers: {
+              access_token: localStorage.access_token,
+            },
+          }
+        );
+        this.getMyCourse();
+        console.log(data);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async toSubsribe(value) {
+      try {
+        const { data } = await axios.post(
+          originUrl + `/mycourses/payment/${value}`,
+          {},
+          {
+            headers: {
+              access_token: localStorage.access_token,
+            },
+          }
+        );
+        const cb = this.statusSubsribe;
+        window.snap.pay(data.token, {
+          onSuccess: function (result) {
+            /* You may add your own implementation here */
+            alert("payment success!");
+            cb(value);
+          },
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    },
     async forWatch(id) {
       try {
         const { data } = await axios.get(originUrl + `/mycourses/${id}`, {
